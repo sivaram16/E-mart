@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:pazhamuthir_emart/constants/colors.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:pazhamuthir_emart/screens/Cart.dart';
 
 class Home_Screen extends StatefulWidget {
   @override
@@ -44,7 +44,8 @@ class _Home_ScreenState extends State<Home_Screen> {
                         "Hi, Vineesh",
                         style: TextStyle(
                             color: WHITE_COLOR,
-                            fontFamily: 'Raleway-Bold',
+                            fontFamily: 'Raleway',
+                            fontWeight: FontWeight.bold,
                             fontSize: 24),
                       ),
                     ),
@@ -238,17 +239,21 @@ class _Home_ScreenState extends State<Home_Screen> {
         Container(
             padding: EdgeInsets.only(left: 20, top: 15),
             child: _catText("Vegetables")),
-        _showItem(),
+        _items(),
         quantity == 0 ? Container() : _bottomSheet(),
       ],
     );
   }
 
+  Widget _items() {
+    return Expanded(
+        child: ListView.builder(
+            itemCount: 10, itemBuilder: (context, index) => _showItem()));
+  }
+
   Widget _search() {
     return Container(
-      margin: EdgeInsets.only(top: 40, left: 20),
-      width: 377,
-      height: 55,
+      margin: EdgeInsets.only(top: 40, left: 20, right: 10),
       child: Row(
         children: <Widget>[
           Container(
@@ -293,8 +298,7 @@ class _Home_ScreenState extends State<Home_Screen> {
   Widget _catText(String s) {
     return Text(
       s,
-      style: TextStyle(
-          color: GREY_COLOR, fontSize: 18, fontFamily: 'Raleway-Regular'),
+      style: TextStyle(color: GREY_COLOR, fontSize: 18, fontFamily: 'Raleway'),
     );
   }
 
@@ -317,7 +321,10 @@ class _Home_ScreenState extends State<Home_Screen> {
                   padding: EdgeInsets.only(left: 10),
                   child: Text(
                     "Carrot",
-                    style: TextStyle(fontFamily: 'Raleway-Bold', fontSize: 18),
+                    style: TextStyle(
+                        fontFamily: 'Raleway',
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold),
                   ),
                 ),
                 Container(
@@ -427,7 +434,6 @@ class _Home_ScreenState extends State<Home_Screen> {
 
   Widget _bottomSheet() {
     return Container(
-      margin: EdgeInsets.only(top: MediaQuery.of(context).size.height / 1.93),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(24),
@@ -440,7 +446,14 @@ class _Home_ScreenState extends State<Home_Screen> {
       height: MediaQuery.of(context).size.height / 7,
       child: Row(
         children: <Widget>[
-          _cartItems(),
+          InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Cart()),
+                );
+              },
+              child: _cartItems()),
           Container(margin: EdgeInsets.only(top: 20, left: 50)),
           _checkout()
         ],
@@ -500,14 +513,16 @@ class _Home_ScreenState extends State<Home_Screen> {
                   style: TextStyle(
                       fontSize: 14,
                       color: WHITE_COLOR,
-                      fontFamily: 'Raleway-Bold'),
+                      fontFamily: 'Raleway',
+                      fontWeight: FontWeight.bold),
                 ),
                 Text(
                   "Rs. ${rate * quantity}",
                   style: TextStyle(
                       fontSize: 24,
                       color: WHITE_COLOR,
-                      fontFamily: 'Raleway-Bold'),
+                      fontFamily: 'Raleway',
+                      fontWeight: FontWeight.bold),
                 )
               ],
             ),

@@ -1,14 +1,16 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/cupertino.dart' as prefix0;
 import 'package:flutter/material.dart';
 import 'package:pazhamuthir_emart/constants/colors.dart';
 import 'package:pazhamuthir_emart/screens/home_screen.dart';
+import 'package:pazhamuthir_emart/screens/Auth/createAcc.dart';
 
-class Auth_Screen extends StatefulWidget {
+class AuthScreen extends StatefulWidget {
   @override
-  _Auth_ScreenState createState() => _Auth_ScreenState();
+  _AuthScreenState createState() => _AuthScreenState();
 }
 
-class _Auth_ScreenState extends State<Auth_Screen> {
+class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,7 +19,7 @@ class _Auth_ScreenState extends State<Auth_Screen> {
   }
 
   Widget _layout() {
-    return ListView(
+    return Column(
       children: <Widget>[_title(), _bottomSheet()],
     );
   }
@@ -99,7 +101,7 @@ class _Auth_ScreenState extends State<Auth_Screen> {
       "Sign in",
       textAlign: TextAlign.center,
       style: TextStyle(
-          fontFamily: 'Raleway-Bold',
+          fontFamily: 'Raleway',
           fontSize: 24,
           color: WHITE_COLOR,
           fontWeight: FontWeight.bold),
@@ -133,7 +135,7 @@ class _Auth_ScreenState extends State<Auth_Screen> {
         labelText: "Password",
         labelStyle: TextStyle(
           color: WHITE_COLOR,
-          fontFamily: 'Raleway-Regular',
+          fontFamily: 'Raleway',
           fontSize: 18,
         ),
       ),
@@ -188,12 +190,18 @@ class _Auth_ScreenState extends State<Auth_Screen> {
           height: 38,
           width: 223,
           child: OutlineButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => CreateAcc()),
+              );
+            },
             child: Text(
               "CREATE ACCOUNT",
               style: TextStyle(color: WHITE_COLOR, fontSize: 14),
             ),
             borderSide: BorderSide(color: WHITE_COLOR),
+            highlightedBorderColor: WHITE_COLOR,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.0),
             ),

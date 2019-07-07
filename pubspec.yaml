@@ -58,13 +58,12 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: Raleway-Bold
+    - family: Raleway
       fonts:
         - asset: assets/font/Raleway-Bold.ttf
-  #         style: italic
-    - family: Raleway-Regular
-      fonts:
         - asset: assets/font/Raleway-Regular.ttf
+
+  #         style: italic
   #         weight: 700
   #
   # For details regarding fonts from package dependencies,
