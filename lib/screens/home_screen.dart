@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:pazhamuthir_emart/constants/colors.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:pazhamuthir_emart/screens/Cart.dart';
+import 'package:pazhamuthir_emart/screens/my_profile.dart';
 
 class Home_Screen extends StatefulWidget {
   @override
@@ -40,13 +41,22 @@ class _Home_ScreenState extends State<Home_Screen> {
                     ),
                     Container(
                       padding: EdgeInsets.only(top: 50),
-                      child: Text(
-                        "Hi, Vineesh",
-                        style: TextStyle(
-                            color: WHITE_COLOR,
-                            fontFamily: 'Raleway',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 24),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => MyProfile()),
+                          );
+                        },
+                        child: Text(
+                          "Hi, Vineesh",
+                          style: TextStyle(
+                              color: WHITE_COLOR,
+                              fontFamily: 'Raleway',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 24),
+                        ),
                       ),
                     ),
                   ],
@@ -446,14 +456,7 @@ class _Home_ScreenState extends State<Home_Screen> {
       height: MediaQuery.of(context).size.height / 7,
       child: Row(
         children: <Widget>[
-          InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Cart()),
-                );
-              },
-              child: _cartItems()),
+          InkWell(onTap: () {}, child: _cartItems()),
           Container(margin: EdgeInsets.only(top: 20, left: 50)),
           _checkout()
         ],
@@ -471,7 +474,12 @@ class _Home_ScreenState extends State<Home_Screen> {
               height: 48,
               child: RaisedButton(
                 color: WHITE_COLOR,
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Cart()),
+                  );
+                },
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0),
                 ),

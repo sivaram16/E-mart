@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pazhamuthir_emart/components/AppTitleWidget.dart';
 import 'package:pazhamuthir_emart/constants/colors.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:pazhamuthir_emart/screens/order_placed.dart';
 
 class SelectAdress extends StatefulWidget {
   @override
@@ -90,17 +92,17 @@ class _SelectAdressState extends State<SelectAdress> {
               padding: EdgeInsets.only(left: 8, top: 32),
               child: Row(
                 children: <Widget>[
-                  Icon(
-                    Icons.attach_money,
-                    color: GREEN_COLOR,
-                  ),
-                  Text(
-                    "Cash on Delivery",
-                    style: TextStyle(
-                      color: GREEN_COLOR,
-                      fontFamily: 'Raleway',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                  SvgImage.asset('assets/images/Vector.svg', Size(24, 24)),
+                  Container(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Text(
+                      "Cash on Delivery",
+                      style: TextStyle(
+                        color: GREEN_COLOR,
+                        fontFamily: 'Raleway',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
                     ),
                   ),
                 ],
@@ -116,7 +118,7 @@ class _SelectAdressState extends State<SelectAdress> {
                   ),
                 )),
             Container(
-                padding: EdgeInsets.only(left: 20, top: 140,bottom: 10),
+                padding: EdgeInsets.only(left: 20, top: 140, bottom: 10),
                 child: _placeOrder()),
           ],
         ),
@@ -198,10 +200,10 @@ class _SelectAdressState extends State<SelectAdress> {
           child: RaisedButton(
             color: GREEN_COLOR,
             onPressed: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(builder: (context) => Home_Screen()),
-              // );
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => OrderPlaced()),
+              );
             },
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10.0),

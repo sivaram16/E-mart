@@ -16,27 +16,29 @@ class _CreateAccState extends State<CreateAcc> {
   }
 
   Widget _layout() {
-    return Container(
-        padding: EdgeInsets.only(left: 10, right: 28),
-        child: Column(
-          children: <Widget>[
-            AppTitleWidget(
-              title: "Create Account",
-              subtitle:
-                  "The details you provide here will be used for managing this app. You can provide multiple addresses and different details for those addresses.",
-            ),
-            Container(
-              margin: EdgeInsets.only(top: 10),
-            ),
-            _inputField("Name"),
-            _inputField("Mobile number"),
-            _inputField("Password"),
-            _inputField("Confirm Password"),
-            Container(
-                padding: EdgeInsets.only(top: 50, left: 100),
-                child: _createAcc()),
-          ],
-        ));
+    return ListView(children: <Widget>[
+      Container(
+          padding: EdgeInsets.only(left: 10, right: 28),
+          child: Column(
+            children: <Widget>[
+              AppTitleWidget(
+                title: "Create Account",
+                subtitle:
+                    "The details you provide here will be used for managing this app. You can provide multiple addresses and different details for those addresses.",
+              ),
+              Container(
+                margin: EdgeInsets.only(top: 10),
+              ),
+              _inputField("Name"),
+              _inputField("Mobile number"),
+              _inputField("Password"),
+              _inputField("Confirm Password"),
+              Container(
+                  padding: EdgeInsets.only(top: 50, left: 100),
+                  child: _createAcc()),
+            ],
+          ))
+    ]);
   }
 
   Widget _inputField(String label) {
