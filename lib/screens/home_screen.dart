@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pazhamuthir_emart/constants/colors.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pazhamuthir_emart/screens/Cart.dart';
 import 'package:pazhamuthir_emart/screens/my_profile.dart';
 
@@ -274,8 +274,7 @@ class _Home_ScreenState extends State<Home_Screen> {
                   onTap: () {
                     Scaffold.of(context).openDrawer();
                   },
-                  child:
-                      SvgImage.asset('assets/images/menu.svg', Size(30, 30)))),
+                  child: SvgPicture.asset('assets/images/menu.svg'))),
           Container(
             padding: EdgeInsets.only(left: 10),
           ),

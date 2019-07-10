@@ -92,7 +92,9 @@ class _SelectAdressState extends State<SelectAdress> {
               padding: EdgeInsets.only(left: 8, top: 32),
               child: Row(
                 children: <Widget>[
-                  SvgImage.asset('assets/images/Vector.svg', Size(24, 24)),
+                  SvgPicture.asset(
+                    'assets/images/Vector.svg',
+                  ),
                   Container(
                     padding: EdgeInsets.only(left: 10),
                     child: Text(
