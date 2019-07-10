@@ -1,9 +1,11 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/cupertino.dart' as prefix0;
 import 'package:flutter/material.dart';
 import 'package:pazhamuthir_emart/constants/colors.dart';
+import 'package:pazhamuthir_emart/constants/graphql/customerLoginAuth.dart';
+import 'package:pazhamuthir_emart/models/UserModel.dart';
 import 'package:pazhamuthir_emart/screens/home_screen.dart';
 import 'package:pazhamuthir_emart/screens/Auth/createAcc.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthScreen extends StatefulWidget {
   @override
@@ -11,6 +13,8 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
+  Map input = {"number": "", "password": ""};
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,7 +23,7 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   Widget _layout() {
-    return Column(
+    return ListView(
       children: <Widget>[_title(), _bottomSheet()],
     );
   }
@@ -78,17 +82,11 @@ class _AuthScreenState extends State<AuthScreen> {
           Container(margin: EdgeInsets.only(top: 5)),
           _loginText(),
           Container(margin: EdgeInsets.only(top: 40)),
-          _usernameTextField(),
+          _numberTextField(),
           Container(margin: EdgeInsets.only(top: 10)),
           _userpasswordField(),
           Container(margin: EdgeInsets.only(top: 20)),
-          Row(
-            children: <Widget>[
-              _forgot(),
-              Container(margin: EdgeInsets.only(top: 20)),
-              _loginButton()
-            ],
-          ),
+          _mutationComponent(),
           Container(margin: EdgeInsets.only(top: 70)),
           _createAcc(),
         ],
@@ -108,8 +106,13 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  Widget _usernameTextField() {
+  Widget _numberTextField() {
     return TextField(
+      onChanged: (value) {
+        setState(() {
+          input["number"] = value;
+        });
+      },
       style: TextStyle(color: WHITE_COLOR),
       decoration: InputDecoration(
         labelText: "Phone Number",
@@ -118,7 +121,7 @@ class _AuthScreenState extends State<AuthScreen> {
             UnderlineInputBorder(borderSide: BorderSide(color: WHITE_COLOR)),
         labelStyle: TextStyle(
           color: WHITE_COLOR,
-          fontFamily: 'Raleway-Regular',
+          fontFamily: 'Raleway',
           fontSize: 18,
         ),
       ),
@@ -127,7 +130,13 @@ class _AuthScreenState extends State<AuthScreen> {
 
   Widget _userpasswordField() {
     return TextField(
+      onChanged: (value) {
+        setState(() {
+          input["password"] = value;
+        });
+      },
       style: TextStyle(color: WHITE_COLOR),
+      obscureText: true,
       decoration: InputDecoration(
         helperStyle: TextStyle(color: WHITE_COLOR),
         focusedBorder:
@@ -142,7 +151,7 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  Widget _loginButton() {
+  Widget _loginButton(RunMutation runmutation) {
     return Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisAlignment: MainAxisAlignment.end,
@@ -153,10 +162,10 @@ class _AuthScreenState extends State<AuthScreen> {
               child: RaisedButton(
                 color: WHITE_COLOR,
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Home_Screen()),
-                  );
+                  runmutation({
+                    "phoneNumber": input['number'],
+                    "password": input['password'],
+                  });
                 },
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0),
@@ -169,17 +178,6 @@ class _AuthScreenState extends State<AuthScreen> {
                 ),
               ))
         ]);
-  }
-
-  Widget _forgot() {
-    return FlatButton(
-      splashColor: Colors.transparent,
-      onPressed: () {},
-      child: Text(
-        "FORGOT PASSWORD ?",
-        style: TextStyle(fontSize: 14, color: WHITE_COLOR),
-      ),
-    );
   }
 
   Widget _createAcc() {
@@ -208,6 +206,40 @@ class _AuthScreenState extends State<AuthScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _mutationComponent() {
+    return Mutation(
+      options: MutationOptions(
+        document: customerLogin,
+      ),
+      builder: (
+        RunMutation runMutation,
+        QueryResult result,
+      ) {
+        return _loginButton(runMutation);
+      },
+      update: (Cache cache, QueryResult result) {
+        return cache;
+      },
+      onCompleted: (dynamic resultData) async {
+        final prefs = await SharedPreferences.getInstance();
+
+        if (resultData != null &&
+            resultData['customerLogin']['error'] == null) {
+          final user = UserModel.fromJson(resultData['customerLogin']['user']);
+          if (user != null) {
+            await prefs.setString(
+                'token', resultData['customerLogin']['jwtToken']);
+
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HomeScreen()),
+            );
+          }
+        }
+      },
     );
   }
 }

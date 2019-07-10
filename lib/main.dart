@@ -1,12 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:pazhamuthir_emart/screens/Auth/auth_screen.dart';
+import 'package:pazhamuthir_emart/screens/home_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool isAuthenticated = false;
+  @override
+  void initState() {
+    _getPref();
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: AuthScreen(),
+    final HttpLink httpLink = HttpLink(
+      uri: 'https://pazhamudhir.herokuapp.com/',
     );
+
+    ValueNotifier<GraphQLClient> client = ValueNotifier(
+      GraphQLClient(
+        cache: InMemoryCache(),
+        link: httpLink as Link,
+      ),
+    );
+    return GraphQLProvider(
+      client: client,
+      child: CacheProvider(
+        child: MaterialApp(
+          home: isAuthenticated ? HomeScreen() : AuthScreen(),
+        ),
+      ),
+    );
+  }
+
+  _getPref() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    setState(() {
+      isAuthenticated = token != null;
+    });
   }
 }

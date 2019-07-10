@@ -5,12 +5,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pazhamuthir_emart/screens/Cart.dart';
 import 'package:pazhamuthir_emart/screens/my_profile.dart';
 
-class Home_Screen extends StatefulWidget {
+class HomeScreen extends StatefulWidget {
   @override
-  _Home_ScreenState createState() => _Home_ScreenState();
+  _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _Home_ScreenState extends State<Home_Screen> {
+class _HomeScreenState extends State<HomeScreen> {
   int quantity = 0, rate = 30;
   @override
   Widget build(BuildContext context) {
