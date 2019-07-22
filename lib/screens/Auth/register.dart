@@ -4,16 +4,19 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:pazhamuthir_emart/constants/graphql/customerRegisterAuth.dart';
 import 'package:pazhamuthir_emart/components/AppTitleWidget.dart';
 import 'package:pazhamuthir_emart/models/UserModel.dart';
+import 'package:pazhamuthir_emart/state/app_state.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../home_screen.dart';
+import '../home.dart';
 
-class CreateAcc extends StatefulWidget {
+
+class Register extends StatefulWidget {
   @override
-  _CreateAccState createState() => _CreateAccState();
+  _RegisterState createState() => _RegisterState();
 }
 
-class _CreateAccState extends State<CreateAcc> {
+class _RegisterState extends State<Register> {
   Map input = {
     "name": "",
     "phoneNumber": "",
@@ -120,14 +123,17 @@ class _CreateAccState extends State<CreateAcc> {
       },
       onCompleted: (dynamic resultData) async {
         final prefs = await SharedPreferences.getInstance();
+        final appState = Provider.of<AppState>(context);
 
         if (resultData != null &&
             resultData['customerRegister']['error'] == null) {
           final user =
               UserModel.fromJson(resultData['customerRegister']['user']);
           if (user != null) {
-            await prefs.setString(
-                'token', resultData['customerRegister']['jwtToken']);
+            final String token = resultData['customerRegister']['jwtToken'];
+
+            await prefs.setString('token', token);
+            appState.setToken(token);
 
             Navigator.pushReplacement(
               context,

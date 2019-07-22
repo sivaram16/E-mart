@@ -4,12 +4,12 @@ import 'package:pazhamuthir_emart/constants/colors.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:pazhamuthir_emart/screens/order_placed.dart';
 
-class SelectAdress extends StatefulWidget {
+class SelectAddress extends StatefulWidget {
   @override
-  _SelectAdressState createState() => _SelectAdressState();
+  _SelectAddressState createState() => _SelectAddressState();
 }
 
-class _SelectAdressState extends State<SelectAdress> {
+class _SelectAddressState extends State<SelectAddress> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:pazhamuthir_emart/screens/Auth/auth_screen.dart';
-import 'package:pazhamuthir_emart/screens/home_screen.dart';
+import 'package:pazhamuthir_emart/screens/Auth/login.dart';
+import 'package:pazhamuthir_emart/screens/home.dart';
+import 'package:pazhamuthir_emart/state/app_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 void main() => runApp(MyApp());
 
@@ -35,8 +37,11 @@ class _MyAppState extends State<MyApp> {
     return GraphQLProvider(
       client: client,
       child: CacheProvider(
-        child: MaterialApp(
-          home: isAuthenticated ? HomeScreen() : AuthScreen(),
+        child: ChangeNotifierProvider<AppState>(
+          builder: (_) => AppState(),
+          child: MaterialApp(
+            home: isAuthenticated ? HomeScreen() : Login(),
+          ),
         ),
       ),
     );

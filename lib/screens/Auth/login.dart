@@ -2,17 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:pazhamuthir_emart/constants/colors.dart';
 import 'package:pazhamuthir_emart/constants/graphql/customerLoginAuth.dart';
 import 'package:pazhamuthir_emart/models/UserModel.dart';
-import 'package:pazhamuthir_emart/screens/home_screen.dart';
-import 'package:pazhamuthir_emart/screens/Auth/createAcc.dart';
+import 'package:pazhamuthir_emart/screens/Auth/register.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:pazhamuthir_emart/state/app_state.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class AuthScreen extends StatefulWidget {
+import '../home.dart';
+
+class Login extends StatefulWidget {
   @override
-  _AuthScreenState createState() => _AuthScreenState();
+  _LoginState createState() => _LoginState();
 }
 
-class _AuthScreenState extends State<AuthScreen> {
+class _LoginState extends State<Login> {
   Map input = {"number": "", "password": ""};
 
   @override
@@ -191,7 +194,7 @@ class _AuthScreenState extends State<AuthScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => CreateAcc()),
+                MaterialPageRoute(builder: (context) => Register()),
               );
             },
             child: Text(
@@ -225,14 +228,15 @@ class _AuthScreenState extends State<AuthScreen> {
       },
       onCompleted: (dynamic resultData) async {
         final prefs = await SharedPreferences.getInstance();
+        final appState = Provider.of<AppState>(context);
 
         if (resultData != null &&
             resultData['customerLogin']['error'] == null) {
           final user = UserModel.fromJson(resultData['customerLogin']['user']);
           if (user != null) {
-            await prefs.setString(
-                'token', resultData['customerLogin']['jwtToken']);
-
+            final String token = resultData['customerLogin']['jwtToken'];
+            await prefs.setString('token', token);
+            appState.setToken(token);
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => HomeScreen()),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pazhamuthir_emart/constants/colors.dart';
-import 'package:pazhamuthir_emart/screens/Auth/select_address.dart';
+import 'package:pazhamuthir_emart/screens/select_address.dart';
 
 class Cart extends StatefulWidget {
   @override
@@ -223,7 +223,7 @@ class _CartState extends State<Cart> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => SelectAdress()),
+                    MaterialPageRoute(builder: (context) => SelectAddress()),
                   );
                 },
                 shape: RoundedRectangleBorder(
