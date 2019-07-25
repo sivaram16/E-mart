@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
 
 class AppTitleWidget extends StatelessWidget {
-  String title;
-  String subtitle;
-  Function onBackPressed;
-  AppTitleWidget(
-      {Key key, String title, String subtitle, Function onBackPressed})
-      : super(key: key) {
-    this.title = title;
-    this.subtitle = subtitle;
-    this.onBackPressed = onBackPressed;
-  }
+  final String title;
+  final String subtitle;
+  final Function onBackPressed;
+  AppTitleWidget({this.title, this.subtitle, this.onBackPressed});
 
   @override
   Widget build(BuildContext context) {

@@ -25,6 +25,7 @@ dependencies:
   cupertino_icons: ^0.1.2
   graphql_flutter: ^1.0.0
   shared_preferences: ^0.4.3
+  url_launcher: 
   flutter_svg: 
   provider:
 

@@ -5,10 +5,15 @@ import 'package:pazhamuthir_emart/constants/colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pazhamuthir_emart/constants/graphql/getAllInventory.dart';
 import 'package:pazhamuthir_emart/models/InventoryItemModel.dart';
-import 'package:pazhamuthir_emart/screens/Cart.dart';
+import 'package:pazhamuthir_emart/screens/cart.dart';
 import 'package:pazhamuthir_emart/screens/my_profile.dart';
+import 'package:pazhamuthir_emart/screens/your_orders.dart';
 import 'package:pazhamuthir_emart/state/app_state.dart';
+import 'package:pazhamuthir_emart/state/cart_state.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'Auth/login.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -16,10 +21,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int quantity = 0, rate = 30;
+  double totalPrice = 0;
   List<String> categories = ["All"];
   String query = "";
-  String selectedCategory = "";
+  String selectedCategory = "All";
+  String name = "";
+
+  List<Map<String, dynamic>> cartItems = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,6 +38,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Drawer buildDrawer(BuildContext context) {
+    final appState = Provider.of<AppState>(context);
+
     return Drawer(
       child: Container(
         color: GREEN_COLOR,
@@ -54,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.only(top: 50),
+                    padding: EdgeInsets.only(top: 40),
                     child: InkWell(
                       onTap: () {
                         Navigator.push(
@@ -62,13 +73,26 @@ class _HomeScreenState extends State<HomeScreen> {
                           MaterialPageRoute(builder: (context) => MyProfile()),
                         );
                       },
-                      child: Text(
-                        "Hi, Vineesh",
-                        style: TextStyle(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Icon(
+                            Icons.face,
                             color: WHITE_COLOR,
-                            fontFamily: 'Raleway',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 24),
+                            size: 25,
+                          ),
+                          Container(
+                            margin: EdgeInsets.only(left: 10),
+                          ),
+                          Text(
+                            "Hi, ${appState.name}",
+                            style: TextStyle(
+                                color: WHITE_COLOR,
+                                fontFamily: 'Raleway',
+                                fontWeight: FontWeight.bold,
+                                fontSize: 24),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -107,35 +131,14 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: EdgeInsets.only(left: 20),
               child: ListTile(
                 title: Text(
-                  'CART',
-                  style: TextStyle(color: WHITE_COLOR, fontSize: 14),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.only(left: 20),
-              child: ListTile(
-                title: Text(
                   'ORDERS',
                   style: TextStyle(color: WHITE_COLOR, fontSize: 14),
                 ),
                 onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.only(left: 20),
-              child: ListTile(
-                title: Text(
-                  'ACCOUNT',
-                  style: TextStyle(color: WHITE_COLOR, fontSize: 14),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => YourOrders()),
+                  );
                 },
               ),
             ),
@@ -146,8 +149,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   'LOGOUT',
                   style: TextStyle(color: WHITE_COLOR, fontSize: 14),
                 ),
-                onTap: () {
-                  Navigator.pop(context);
+                onTap: () async {
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.clear();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => Login()),
+                  );
                 },
               ),
             ),
@@ -159,6 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget categoriesComponents(List<String> categories, BuildContext context) {
     return ListView.builder(
+        physics: ScrollPhysics(),
         shrinkWrap: true,
         itemCount: categories.length,
         itemBuilder: (context, index) {
@@ -196,7 +205,7 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: EdgeInsets.only(left: 20, top: 15),
             child: _catText("$selectedCategory")),
         _getInventoryQuery(),
-        quantity == 0 ? Container() : _bottomSheet(),
+        cartItems.length == 0 ? Container() : _bottomSheet(),
       ],
     );
   }
@@ -211,7 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
             'Authorization': 'Bearer ${appState.jwtToken}',
           },
         },
-        pollInterval: 10,
+        pollInterval: 5,
       ),
       builder: (QueryResult result, {VoidCallback refetch}) {
         if (result.loading) return Center(child: CupertinoActivityIndicator());
@@ -296,10 +305,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _showItem(InventoryItemModel inventory) {
-    if (inventory.category != selectedCategory &&
-        selectedCategory != "All" &&
+    if (inventory.category != selectedCategory && selectedCategory != "All" ||
         query != "" &&
-        !inventory.name.contains(query)) return Container();
+            !inventory.name.toLowerCase().contains(query.toLowerCase()))
+      return Container();
+
+    final inv = cartItems.firstWhere((f) => f['itemId'] == inventory.id,
+        orElse: () => null);
     return Container(
       padding: EdgeInsets.only(left: 20, right: 20),
       child: Row(
@@ -334,13 +346,16 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           Container(
-              child: quantity == 0 ? _addFlatButton() : _addOutLineButton()),
+              child: inv == null
+                  ? _addFlatButton(inventory)
+                  : _addOutLineButton(inventory)),
         ],
       ),
     );
   }
 
-  Widget _addFlatButton() {
+  Widget _addFlatButton(InventoryItemModel inventory) {
+    final cartState = Provider.of<CartState>(context);
     return Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisAlignment: MainAxisAlignment.end,
@@ -352,7 +367,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: GREEN_COLOR,
                 onPressed: () {
                   setState(() {
-                    quantity += 1;
+                    cartItems.add({
+                      "name": inventory.name,
+                      "item": inventory,
+                      "itemId": inventory.id,
+                      "quantity": 1,
+                      "price": inventory.price
+                    });
+                    cartState.setCartItems(cartItems);
+                    totalPrice += inventory.price;
                   });
                 },
                 shape: RoundedRectangleBorder(
@@ -367,7 +390,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ]);
   }
 
-  Widget _addOutLineButton() {
+  Widget _addOutLineButton(InventoryItemModel inventory) {
+    final inv = cartItems.firstWhere((f) => f['itemId'] == inventory.id,
+        orElse: () => null);
+
     return Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisAlignment: MainAxisAlignment.end,
@@ -376,6 +402,7 @@ class _HomeScreenState extends State<HomeScreen> {
               width: 120,
               height: 48,
               child: OutlineButton(
+                onPressed: () {},
                 padding: EdgeInsets.all(0),
                 color: GREEN_COLOR,
                 shape: RoundedRectangleBorder(
@@ -390,7 +417,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: InkWell(
                         onTap: () {
                           setState(() {
-                            quantity -= 1;
+                            inv["quantity"] -= 1;
+                            totalPrice -= inventory.price;
+                            inv["price"] -= inventory.price;
+
+                            if (inv["quantity"] == 0)
+                              cartItems.removeWhere(
+                                  (item) => item["itemId"] == inventory.id);
                           });
                         },
                         child: Icon(
@@ -401,7 +434,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     Center(
                       child: Text(
-                        "$quantity",
+                        "${inv["quantity"]}",
                         style: TextStyle(
                             color: BLACK_COLOR,
                             fontSize: 18,
@@ -414,7 +447,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: InkWell(
                         onTap: () {
                           setState(() {
-                            quantity += 1;
+                            inv["quantity"] += 1;
+                            inv["price"] += inventory.price;
+                            totalPrice += inventory.price;
                           });
                         },
                         child: Icon(
@@ -464,7 +499,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => Cart()),
+                    MaterialPageRoute(
+                        builder: (context) => Cart(
+                              cartItems: cartItems,
+                              totalPrice: totalPrice,
+                              clearCartItems: () {
+                                setState(() {
+                                  cartItems = [];
+                                  totalPrice = 0;
+                                });
+                              },
+                            )),
                   );
                 },
                 shape: RoundedRectangleBorder(
@@ -504,7 +549,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               children: <Widget>[
                 Text(
-                  "2 items in cart",
+                  "${cartItems.length} items in cart",
                   style: TextStyle(
                       fontSize: 14,
                       color: WHITE_COLOR,
@@ -512,7 +557,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  "Rs. ${rate * quantity}",
+                  "Rs. $totalPrice",
                   style: TextStyle(
                       fontSize: 24,
                       color: WHITE_COLOR,

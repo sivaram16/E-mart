@@ -3,6 +3,11 @@ import 'package:pazhamuthir_emart/constants/colors.dart';
 import 'package:pazhamuthir_emart/screens/your_orders.dart';
 
 class OrderPlaced extends StatefulWidget {
+  final String orderNo;
+  final int price;
+
+  const OrderPlaced({this.orderNo, this.price});
+
   @override
   _OrderPlacedState createState() => _OrderPlacedState();
 }
@@ -40,7 +45,7 @@ class _OrderPlacedState extends State<OrderPlaced> {
             Container(
               padding: EdgeInsets.only(top: 20),
               child: Text(
-                "Order No. 44234",
+                "Order No. ${widget.orderNo}",
                 style: TextStyle(
                   fontSize: 18,
                 ),
@@ -63,7 +68,7 @@ class _OrderPlacedState extends State<OrderPlaced> {
             Container(
               padding: EdgeInsets.only(top: 10),
               child: Text(
-                "Rs. 4567",
+                "Rs. ${widget.price}",
                 style: TextStyle(
                     fontSize: 46,
                     fontWeight: FontWeight.bold,
@@ -77,8 +82,11 @@ class _OrderPlacedState extends State<OrderPlaced> {
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
               ),
             ),
+            Expanded(
+              child: Container(),
+            ),
             Container(
-                padding: EdgeInsets.only(top: 100, left: 30),
+                padding: EdgeInsets.only(bottom: 20, left: 30),
                 child: _placeOrder()),
           ],
         ),

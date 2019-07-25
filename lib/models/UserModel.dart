@@ -1,4 +1,3 @@
-import 'package:pazhamuthir_emart/models/AddressModel.dart';
 
 class UserModel {
   final String id;

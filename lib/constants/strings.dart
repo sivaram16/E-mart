@@ -1,12 +1,10 @@
-/* UI Display Text Strings */
-
 class OrderStatuses {
-  static const String PLACED_BY_CUST = 'PLACED_BY_CUST';
+  static const String PLACED_BY_CUSTOMER = 'PLACED_BY_CUSTOMER';
   static const String RECEIVED_BY_STORE = 'RECEIVED_BY_STORE';
   static const String PICKED_UP = 'PICKED_UP';
   static const String DELIVERED_AND_PAID = 'DELIVERED_AND_PAID';
   static const String CANCELLED_BY_STORE = 'CANCELLED_BY_STORE';
-  static const String CANCELLED_BY_CUST = 'CANCELLED_BY_CUST';
+  static const String CANCELLED_BY_CUSTOMER = 'CANCELLED_BY_CUSTOMER';
 }
 
 const String STRING_PICKED_UP =
@@ -29,7 +27,7 @@ const String STRING_CANCELLED_BY_CUST = 'You cancelled this order.';
 class StringResolver {
   static String getTextForOrderStatus({String status}) {
     switch (status) {
-      case OrderStatuses.CANCELLED_BY_CUST:
+      case OrderStatuses.CANCELLED_BY_CUSTOMER:
         {
           return STRING_CANCELLED_BY_CUST;
         }
@@ -45,7 +43,7 @@ class StringResolver {
         {
           return STRING_PICKED_UP;
         }
-      case OrderStatuses.PLACED_BY_CUST:
+      case OrderStatuses.PLACED_BY_CUSTOMER:
         {
           return STRING_PLACED_BY_CUST;
         }

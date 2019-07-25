@@ -10,7 +10,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../home.dart';
 
-
 class Register extends StatefulWidget {
   @override
   _RegisterState createState() => _RegisterState();
@@ -133,7 +132,11 @@ class _RegisterState extends State<Register> {
             final String token = resultData['customerRegister']['jwtToken'];
 
             await prefs.setString('token', token);
+            await prefs.setString('name', user.name);
+            await prefs.setString('phone number', user.phoneNumber);
             appState.setToken(token);
+            appState.setName(user.name);
+            appState.setPhoneNumner(user.phoneNumber);
 
             Navigator.pushReplacement(
               context,

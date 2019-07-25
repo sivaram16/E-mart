@@ -1,7 +1,17 @@
+import 'dart:convert';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:pazhamuthir_emart/components/AppTitleWidget.dart';
 import 'package:pazhamuthir_emart/constants/colors.dart';
+import 'package:pazhamuthir_emart/constants/graphql/getCustomerInfo.dart';
 import 'package:pazhamuthir_emart/screens/add_address.dart';
+import 'package:pazhamuthir_emart/state/app_state.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'Auth/login.dart';
 
 class MyProfile extends StatefulWidget {
   @override
@@ -17,6 +27,8 @@ class _MyProfileState extends State<MyProfile> {
   }
 
   Widget _layout() {
+    final appState = Provider.of<AppState>(context);
+
     return Container(
       padding: EdgeInsets.only(left: 10, right: 0),
       child: Column(
@@ -37,7 +49,7 @@ class _MyProfileState extends State<MyProfile> {
           Container(
             padding: EdgeInsets.only(left: 10),
             child: Text(
-              "Vineesh, 9944542312",
+              "${appState.name}, ${appState.phoneNumber}",
               style: TextStyle(
                 color: GREEN_COLOR,
                 fontFamily: 'Raleway',
@@ -51,14 +63,12 @@ class _MyProfileState extends State<MyProfile> {
               Container(
                   padding: EdgeInsets.only(top: 52, left: 10),
                   child: Text("SAVED ADDRESSES")),
-              Container(
-                  padding: EdgeInsets.only(left: 170, top: 52),
-                  child: _addAddress()),
             ],
           ),
-          _address(),
+          _getAddressQuery(),
+          Expanded(child: Container()),
           Container(
-              padding: EdgeInsets.only(left: 10, top: 170),
+              padding: EdgeInsets.only(left: 10, bottom: 20),
               child: _aboutText()),
         ],
       ),
@@ -74,7 +84,14 @@ class _MyProfileState extends State<MyProfile> {
               width: 120,
               height: 48,
               child: OutlineButton(
-                onPressed: () {},
+                onPressed: () async {
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.clear();
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => Login()),
+                      (val) => false);
+                },
                 padding: EdgeInsets.all(0),
                 color: GREEN_COLOR,
                 shape: RoundedRectangleBorder(
@@ -92,42 +109,39 @@ class _MyProfileState extends State<MyProfile> {
   }
 
   Widget _addAddress() {
-    return Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: <Widget>[
-          SizedBox(
-              width: 73,
-              height: 35,
-              child: OutlineButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AddAddress()),
-                  );
-                },
-                padding: EdgeInsets.all(0),
-                color: GREEN_COLOR,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                child: Center(
-                  child: Text(
-                    "ADD",
-                    style: TextStyle(
-                        color: GREEN_COLOR, fontSize: 14, letterSpacing: 1.8),
-                  ),
-                ),
-              ))
-        ]);
+    return Center(
+      child: Container(
+          margin: EdgeInsets.only(top: 50),
+          width: 73,
+          height: 35,
+          child: OutlineButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AddAddress()),
+              );
+            },
+            padding: EdgeInsets.all(0),
+            color: GREEN_COLOR,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: Center(
+              child: Text(
+                "ADD",
+                style: TextStyle(
+                    color: GREEN_COLOR, fontSize: 14, letterSpacing: 1.8),
+              ),
+            ),
+          )),
+    );
   }
 
-  Widget _address() {
+  Widget _address(Map address) {
     return Container(
       height: 125,
       width: 366,
       margin: EdgeInsets.all(15.0),
-      padding: EdgeInsets.all(3.0),
       decoration: new BoxDecoration(
           color: Colors.white,
           border: Border.all(color: Colors.green, width: 2),
@@ -144,7 +158,7 @@ class _MyProfileState extends State<MyProfile> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Text(
-                  "Mr. Vineesh",
+                  "Mr. ${address["name"]}",
                   style: TextStyle(
                     color: BLACK_COLOR,
                     fontFamily: 'Raleway',
@@ -153,11 +167,13 @@ class _MyProfileState extends State<MyProfile> {
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.only(left: 140),
-                ),
-                Container(
                   child: IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AddAddress()));
+                    },
                     icon: Icon(
                       Icons.edit,
                       color: GREY_COLOR,
@@ -167,13 +183,13 @@ class _MyProfileState extends State<MyProfile> {
               ],
             ),
             Text(
-              "10/672, Madalayam Road,\nJanata Nagar, Coimbatore - 641035",
+              "${address["addressLine"]}",
               style: TextStyle(
                 fontSize: 12,
               ),
             ),
             Text(
-              "+91 9897866767",
+              "${address["phoneNumber"]}",
               style: TextStyle(
                 fontSize: 12,
                 color: BLACK_COLOR,
@@ -188,13 +204,38 @@ class _MyProfileState extends State<MyProfile> {
 
   Widget _aboutText() {
     return Text(
-      "Thank you for using Pazhamuthir E-Mart App. \n Developed by SIVARAM",
+      "Thank you for using Pazhamuthir E-Mart App. \n Developed by Team 404Found",
       style: TextStyle(
         color: GREEN_COLOR,
         fontSize: 14,
         fontFamily: 'Raleway',
         fontWeight: FontWeight.bold,
       ),
+    );
+  }
+
+  Widget _getAddressQuery() {
+    final appState = Provider.of<AppState>(context);
+    return Query(
+      options: QueryOptions(
+        document: getCustomerInfo,
+        context: {
+          'headers': <String, String>{
+            'Authorization': 'Bearer ${appState.jwtToken}',
+          },
+        },
+        pollInterval: 5,
+      ),
+      builder: (QueryResult result, {VoidCallback refetch}) {
+        if (result.loading) return Center(child: CupertinoActivityIndicator());
+        String addressString =
+            result.data["getCustomerInfo"]["user"]["address"];
+        if (addressString == null) {
+          return _addAddress();
+        }
+        Map address = jsonDecode(addressString);
+        return _address(address);
+      },
     );
   }
 }

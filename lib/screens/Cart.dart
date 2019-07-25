@@ -3,6 +3,12 @@ import 'package:pazhamuthir_emart/constants/colors.dart';
 import 'package:pazhamuthir_emart/screens/select_address.dart';
 
 class Cart extends StatefulWidget {
+  final List<Map<String, dynamic>> cartItems;
+  final double totalPrice;
+  final VoidCallback clearCartItems;
+
+  Cart({this.cartItems, this.totalPrice, this.clearCartItems});
+
   @override
   _CartState createState() => _CartState();
 }
@@ -25,7 +31,7 @@ class _CartState extends State<Cart> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Container(
-                padding: EdgeInsets.only(left: 18, top: 48, right: 18),
+                padding: EdgeInsets.only(left: 12, top: 48, right: 18),
                 child: Text(
                   "Cart",
                   style: TextStyle(
@@ -37,9 +43,12 @@ class _CartState extends State<Cart> {
                 ),
               ),
               Container(
-                padding: EdgeInsets.only(left: 18, top: 48, right: 18),
+                padding: EdgeInsets.only(left: 18, top: 55, right: 18),
                 child: IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    widget.clearCartItems();
+                    Navigator.pop(context);
+                  },
                   icon: Icon(
                     Icons.delete,
                     color: GREY_COLOR,
@@ -55,113 +64,25 @@ class _CartState extends State<Cart> {
     );
   }
 
-  Widget _item() {
+  Widget _item(Map item) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
         Text(
-          "Carrot",
+          "${item["item"]?.name}",
           style: TextStyle(
             fontFamily: 'Raleway',
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
         ),
-        quantity == 0 ? _addFlatButton() : _addOutLineButton(),
+        Text("x ${item["quantity"]}"),
         Text(
-          "Rs. ${quantity * rate}",
+          "Rs. ${item["price"]}",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ],
     );
-  }
-
-  Widget _addOutLineButton() {
-    return Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: <Widget>[
-          SizedBox(
-              height: 48,
-              child: OutlineButton(
-                padding: EdgeInsets.all(0),
-                color: GREEN_COLOR,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    SizedBox(
-                      height: 50,
-                      width: 50,
-                      child: InkWell(
-                        onTap: () {
-                          setState(() {
-                            quantity -= 1;
-                          });
-                        },
-                        child: Icon(
-                          Icons.remove,
-                          color: BLACK_COLOR,
-                        ),
-                      ),
-                    ),
-                    Center(
-                      child: Text(
-                        "$quantity",
-                        style: TextStyle(
-                            color: BLACK_COLOR,
-                            fontSize: 18,
-                            letterSpacing: 1.8),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 50,
-                      width: 50,
-                      child: InkWell(
-                        onTap: () {
-                          setState(() {
-                            quantity += 1;
-                          });
-                        },
-                        child: Icon(
-                          Icons.add,
-                          color: BLACK_COLOR,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ))
-        ]);
-  }
-
-  Widget _addFlatButton() {
-    return Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: <Widget>[
-          SizedBox(
-              width: 120,
-              height: 48,
-              child: FlatButton(
-                color: GREEN_COLOR,
-                onPressed: () {
-                  setState(() {
-                    quantity += 1;
-                  });
-                },
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                child: Text(
-                  "ADD",
-                  style: TextStyle(
-                      color: WHITE_COLOR, fontSize: 18, letterSpacing: 1.8),
-                ),
-              ))
-        ]);
   }
 
   Widget _bottomSheet() {
@@ -184,16 +105,16 @@ class _CartState extends State<Cart> {
                     fontSize: 14,
                   )),
               Text(
-                "Rs. 5670",
+                "Rs. ${widget.totalPrice}",
                 style: TextStyle(color: WHITE_COLOR, fontSize: 18),
               )
             ],
           ),
           Text(
-            "13 items",
+            " ${widget.cartItems.length} items",
             style: TextStyle(color: WHITE_COLOR, fontSize: 14),
           ),
-          Container(padding: EdgeInsets.only(top: 10), child: _checkout()),
+          Container(padding: EdgeInsets.only(top: 10), child: _selectAddress()),
         ],
       ),
     );
@@ -206,11 +127,11 @@ class _CartState extends State<Cart> {
                   height: 20,
                 ),
             padding: EdgeInsets.only(left: 10, right: 10),
-            itemCount: 5,
-            itemBuilder: (context, index) => _item()));
+            itemCount: widget.cartItems.length,
+            itemBuilder: (context, index) => _item(widget.cartItems[index])));
   }
 
-  Widget _checkout() {
+  Widget _selectAddress() {
     return Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisAlignment: MainAxisAlignment.end,
@@ -223,7 +144,10 @@ class _CartState extends State<Cart> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => SelectAddress()),
+                    MaterialPageRoute(
+                        builder: (context) => SelectAddress(
+                              totalPrice: widget.totalPrice,
+                            )),
                   );
                 },
                 shape: RoundedRectangleBorder(

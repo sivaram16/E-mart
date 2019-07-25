@@ -236,7 +236,12 @@ class _LoginState extends State<Login> {
           if (user != null) {
             final String token = resultData['customerLogin']['jwtToken'];
             await prefs.setString('token', token);
+            await prefs.setString('name', user.name);
+            await prefs.setString('phone number', user.phoneNumber);
             appState.setToken(token);
+            appState.setPhoneNumner(user.phoneNumber);
+            appState.setName(user.name);
+
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => HomeScreen()),
