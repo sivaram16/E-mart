@@ -102,9 +102,10 @@ class _OrderPlacedState extends State<OrderPlaced> {
           child: RaisedButton(
             color: GREEN_COLOR,
             onPressed: () {
-              Navigator.push(
+              Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => YourOrders()),
+                (val) => false,
               );
             },
             shape: RoundedRectangleBorder(

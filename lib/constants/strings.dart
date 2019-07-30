@@ -10,7 +10,7 @@ class OrderStatuses {
 const String STRING_PICKED_UP =
     'Your order has been picked up and is on the way.';
 
-const String STRING_PLACED_BY_CUST =
+const String STRING_PLACED_BY_CUSTOMER =
     'Your order is awaiting store confirmation.';
 
 const String STRING_RECEIVED_BY_STORE =
@@ -22,14 +22,14 @@ const String STRING_DELIVERED_AND_PAID =
 const String STRING_CANCELLED_BY_STORE =
     'Your order was cancelled by the store.';
 
-const String STRING_CANCELLED_BY_CUST = 'You cancelled this order.';
+const String STRING_CANCELLED_BY_CUSTOMER = 'You cancelled this order.';
 
 class StringResolver {
   static String getTextForOrderStatus({String status}) {
     switch (status) {
       case OrderStatuses.CANCELLED_BY_CUSTOMER:
         {
-          return STRING_CANCELLED_BY_CUST;
+          return STRING_CANCELLED_BY_CUSTOMER;
         }
       case OrderStatuses.CANCELLED_BY_STORE:
         {
@@ -45,7 +45,7 @@ class StringResolver {
         }
       case OrderStatuses.PLACED_BY_CUSTOMER:
         {
-          return STRING_PLACED_BY_CUST;
+          return STRING_PLACED_BY_CUSTOMER;
         }
       case OrderStatuses.RECEIVED_BY_STORE:
         {

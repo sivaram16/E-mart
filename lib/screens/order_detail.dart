@@ -1,10 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:pazhamuthir_emart/components/AppTitleWidget.dart';
 import 'package:pazhamuthir_emart/constants/colors.dart';
+import 'package:pazhamuthir_emart/constants/graphql/ChangeOrderStatus.dart';
 import 'package:pazhamuthir_emart/constants/strings.dart';
 import 'package:pazhamuthir_emart/models/OrderModel.dart';
+import 'package:pazhamuthir_emart/state/app_state.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class OrderDetail extends StatefulWidget {
@@ -25,6 +29,7 @@ class _OrderDetailState extends State<OrderDetail> {
 
   Widget _layout() {
     return ListView(
+      padding: EdgeInsets.only(left: 5),
       children: <Widget>[
         AppTitleWidget(title: "Order ${widget.order.orderNo}"),
         ListView(
@@ -32,7 +37,16 @@ class _OrderDetailState extends State<OrderDetail> {
           padding: EdgeInsets.fromLTRB(10, 5, 10, 0),
           shrinkWrap: true,
           children: <Widget>[
-            _text("Status", GREEN_COLOR, FontWeight.bold, 18),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                _text("Status", GREEN_COLOR, FontWeight.bold, 18),
+                widget.order.status == OrderStatuses.PLACED_BY_CUSTOMER ||
+                        widget.order.status == OrderStatuses.RECEIVED_BY_STORE
+                    ? _mutationComponent()
+                    : Container(),
+              ],
+            ),
             Container(padding: EdgeInsets.only(top: 5)),
             _text(
               "${widget.order.status.split('_').join(" ").toLowerCase()}",
@@ -152,6 +166,22 @@ class _OrderDetailState extends State<OrderDetail> {
     );
   }
 
+  OutlineButton _outlineButton(RunMutation runMutation) {
+    return OutlineButton(
+      onPressed: () {
+        runMutation({
+          "status": OrderStatuses.CANCELLED_BY_CUSTOMER,
+          "orderId": "${widget.order.id}"
+        });
+        Navigator.pop(context);
+      },
+      child: Text(
+        "CANCEL",
+        style: TextStyle(fontSize: 14, color: Colors.red),
+      ),
+    );
+  }
+
   Widget _text(String text, Color c, FontWeight f, double size) {
     return Text(
       "$text",
@@ -162,6 +192,7 @@ class _OrderDetailState extends State<OrderDetail> {
   Widget _listItems() {
     return ListView.builder(
       shrinkWrap: true,
+      physics: ScrollPhysics(),
       itemCount: widget.order.cartItems.length,
       itemBuilder: (context, index) => Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -186,18 +217,26 @@ class _OrderDetailState extends State<OrderDetail> {
           ],
         ),
         Container(
-          margin: EdgeInsets.only(top: 5),
+          margin: EdgeInsets.only(top: 10),
         ),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             _text("Address:", BLACK_COLOR, null, 14),
-            _text("${widget.order.address.addressLine}", BLACK_COLOR,
-                FontWeight.bold, 14),
+           
+            Expanded(
+              child: Text(
+                "${widget.order.address.addressLine}",
+                style: TextStyle(
+                    color: BLACK_COLOR,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14),
+                textAlign: TextAlign.end,
+              ),
+            ),
           ],
         ),
         Container(
-          margin: EdgeInsets.only(top: 5),
+          margin: EdgeInsets.only(top: 10),
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -208,7 +247,7 @@ class _OrderDetailState extends State<OrderDetail> {
           ],
         ),
         Container(
-          margin: EdgeInsets.only(top: 5),
+          margin: EdgeInsets.only(top: 10),
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -219,6 +258,31 @@ class _OrderDetailState extends State<OrderDetail> {
           ],
         ),
       ],
+    );
+  }
+
+  Widget _mutationComponent() {
+    final appState = Provider.of<AppState>(context);
+
+    return Mutation(
+      options: MutationOptions(
+        document: changeOrder,
+        context: {
+          'headers': <String, String>{
+            'Authorization': 'Bearer ${appState.jwtToken}',
+          },
+        },
+      ),
+      builder: (
+        RunMutation runMutation,
+        QueryResult result,
+      ) {
+        return _outlineButton(runMutation);
+      },
+      update: (Cache cache, QueryResult result) {
+        return cache;
+      },
+      onCompleted: (dynamic resultData) async {},
     );
   }
 }

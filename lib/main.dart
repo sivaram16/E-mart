@@ -25,7 +25,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     final HttpLink httpLink = HttpLink(
-      uri: 'https://pazhamudhir.herokuapp.com/',
+      uri: 'https://pazhamudhir.herokuapp.com/graphql',
     );
 
     ValueNotifier<GraphQLClient> client = ValueNotifier(

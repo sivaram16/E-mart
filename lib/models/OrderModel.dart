@@ -33,7 +33,7 @@ class OrderModel {
         cartItems:
             cartItems.map((item) => CartItemModel.fromJson(item)).toList(),
         status: json['status'],
-        datePlaced: DateTime.fromMillisecondsSinceEpoch(
+        datePlaced: DateTime.fromMicrosecondsSinceEpoch(
           int.parse(json['datePlaced']) * 1000,
         ),
         updatedDate: DateTime.fromMicrosecondsSinceEpoch(

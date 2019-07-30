@@ -24,6 +24,7 @@ class SelectAddress extends StatefulWidget {
 }
 
 class _SelectAddressState extends State<SelectAddress> {
+  bool check = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -210,28 +211,33 @@ class _SelectAddressState extends State<SelectAddress> {
       SizedBox(
           width: 350,
           height: 48,
-          child: RaisedButton(
-            color: GREEN_COLOR,
-            onPressed: () {
-              final cartList = cartState.cartItems.map((f) {
-                f.remove("item");
-                return f;
-              }).toList();
-              runmutation({
-                "address": address,
-                "cartItems": cartList,
-              });
-            },
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            elevation: 10,
-            child: Text(
-              "PLACE ORDER",
-              style: TextStyle(
-                  color: WHITE_COLOR, fontSize: 18, letterSpacing: 1.8),
-            ),
-          ))
+          child: check
+              ? Center(child: CupertinoActivityIndicator())
+              : RaisedButton(
+                  color: GREEN_COLOR,
+                  onPressed: () {
+                    setState(() {
+                      check = true;
+                    });
+                    final cartList = cartState.cartItems.map((f) {
+                      f.remove("item");
+                      return f;
+                    }).toList();
+                    runmutation({
+                      "address": address,
+                      "cartItems": cartList,
+                    });
+                  },
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  elevation: 10,
+                  child: Text(
+                    "PLACE ORDER",
+                    style: TextStyle(
+                        color: WHITE_COLOR, fontSize: 18, letterSpacing: 1.8),
+                  ),
+                ))
     ]);
   }
 

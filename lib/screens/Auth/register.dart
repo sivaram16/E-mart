@@ -22,6 +22,8 @@ class _RegisterState extends State<Register> {
     "password": "",
     "confirmPassword": ""
   };
+  String errors = "";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,19 +45,38 @@ class _RegisterState extends State<Register> {
               Container(
                 margin: EdgeInsets.only(top: 10),
               ),
-              _inputField("Name", "name"),
-              _inputField("Mobile Number", "phoneNumber"),
-              _inputField("Password", "password", secure: true),
-              _inputField("Confirm Password", "confirmPassword", secure: true),
+              _inputField("Name", "name", TextInputType.text),
+              _inputField("Mobile Number", "phoneNumber", TextInputType.number),
+              _inputField("Password", "password", TextInputType.text,
+                  secure: true),
+              _inputField(
+                  "Confirm Password", "confirmPassword", TextInputType.text,
+                  secure: true),
               Container(
-                  padding: EdgeInsets.only(top: 50, left: 100),
-                  child: _mutationComponent()),
+                margin: EdgeInsets.only(top: 30),
+              ),
+              if (errors != "")
+                Center(
+                    child: Text(
+                  "$errors !!",
+                  style:
+                      TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                )),
+              if (input['name'] != "" &&
+                  input['phoneNumber'] != "" &&
+                  input['password'] != "" &&
+                  input['confirmPassword'] != "" &&
+                  input['password'] == input['confirmPassword'])
+                Container(
+                    padding: EdgeInsets.only(top: 30, left: 100),
+                    child: _mutationComponent()),
             ],
           ))
     ]);
   }
 
-  Widget _inputField(String label, String key, {bool secure = false}) {
+  Widget _inputField(String label, String key, TextInputType k,
+      {bool secure = false}) {
     return Container(
       padding: EdgeInsets.only(left: 10, right: 53),
       child: TextField(
@@ -65,6 +86,7 @@ class _RegisterState extends State<Register> {
             input[key] = value;
           });
         },
+        keyboardType: k,
         decoration: InputDecoration(
           enabledBorder:
               UnderlineInputBorder(borderSide: BorderSide(color: BLACK_COLOR)),
@@ -123,6 +145,12 @@ class _RegisterState extends State<Register> {
       onCompleted: (dynamic resultData) async {
         final prefs = await SharedPreferences.getInstance();
         final appState = Provider.of<AppState>(context);
+
+        if (resultData['customerRegister']['error'] != null) {
+          setState(() {
+            errors = resultData['customerRegister']['error']['message'];
+          });
+        }
 
         if (resultData != null &&
             resultData['customerRegister']['error'] == null) {

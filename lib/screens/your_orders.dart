@@ -6,10 +6,11 @@ import 'package:pazhamuthir_emart/constants/colors.dart';
 import 'package:pazhamuthir_emart/constants/graphql/getCustomerOders.dart';
 import 'package:pazhamuthir_emart/constants/strings.dart';
 import 'package:pazhamuthir_emart/models/OrderModel.dart';
-import 'package:pazhamuthir_emart/screens/home.dart';
 import 'package:pazhamuthir_emart/screens/order_detail.dart';
 import 'package:pazhamuthir_emart/state/app_state.dart';
 import 'package:provider/provider.dart';
+
+import 'home.dart';
 
 class YourOrders extends StatefulWidget {
   @override
@@ -24,7 +25,7 @@ class _YourOrdersState extends State<YourOrders> {
 
   Widget _layout() {
     return Container(
-      padding: EdgeInsets.only(left: 10),
+      padding: EdgeInsets.only(left: 5),
       child: ListView(
         children: <Widget>[
           AppTitleWidget(
@@ -105,7 +106,7 @@ class _YourOrdersState extends State<YourOrders> {
                       FontWeight.bold, 14),
                 ],
               ),
-              _text("Placed on ${orders[index].updatedDate}", BLACK_COLOR, null,
+              _text("Placed on ${orders[index].updatedDate.toString().substring(0,19)}", BLACK_COLOR, null,
                   14),
               Row(
                 children: <Widget>[
@@ -240,7 +241,7 @@ class _YourOrdersState extends State<YourOrders> {
             'Authorization': 'Bearer ${appState.jwtToken}',
           },
         },
-        pollInterval: 5,
+        pollInterval: 3,
       ),
       builder: (QueryResult result, {VoidCallback refetch}) {
         if (result.loading) return Center(child: CupertinoActivityIndicator());

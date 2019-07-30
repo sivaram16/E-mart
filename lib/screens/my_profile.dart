@@ -30,7 +30,7 @@ class _MyProfileState extends State<MyProfile> {
     final appState = Provider.of<AppState>(context);
 
     return Container(
-      padding: EdgeInsets.only(left: 10, right: 0),
+      padding: EdgeInsets.only(left: 5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[

@@ -316,8 +316,8 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: EdgeInsets.only(left: 20, right: 20),
       child: Row(
         children: <Widget>[
-          Image.asset(
-            "assets/images/carrot.png",
+          Image.network(
+            'http://pazhamudhir.herokuapp.com/image/${inventory.id}',
             height: 100,
             width: 80,
           ),

@@ -9,7 +9,6 @@ query GetAllInventory{
       unit,
       category,
       inStock,
-      photoUrl
     }
   }
 }""";

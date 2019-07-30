@@ -17,6 +17,7 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   Map input = {"number": "", "password": ""};
+  String errors = "";
 
   @override
   Widget build(BuildContext context) {
@@ -81,6 +82,7 @@ class _LoginState extends State<Login> {
       padding: EdgeInsets.fromLTRB(40, 20, 40, 20),
       height: MediaQuery.of(context).size.height / 1.5,
       child: ListView(
+        physics: ScrollPhysics(),
         children: <Widget>[
           Container(margin: EdgeInsets.only(top: 5)),
           _loginText(),
@@ -90,7 +92,11 @@ class _LoginState extends State<Login> {
           _userpasswordField(),
           Container(margin: EdgeInsets.only(top: 20)),
           _mutationComponent(),
-          Container(margin: EdgeInsets.only(top: 70)),
+          Container(margin: EdgeInsets.only(top: 30)),
+          if (errors != "")
+            Center(
+                child: _text("$errors !!", 14, BLACK_COLOR, FontWeight.bold)),
+          Container(margin: EdgeInsets.only(top: 50)),
           _createAcc(),
         ],
       ),
@@ -117,6 +123,7 @@ class _LoginState extends State<Login> {
         });
       },
       style: TextStyle(color: WHITE_COLOR),
+      keyboardType: TextInputType.number,
       decoration: InputDecoration(
         labelText: "Phone Number",
         helperStyle: TextStyle(color: WHITE_COLOR),
@@ -229,7 +236,11 @@ class _LoginState extends State<Login> {
       onCompleted: (dynamic resultData) async {
         final prefs = await SharedPreferences.getInstance();
         final appState = Provider.of<AppState>(context);
-
+        if (resultData['customerLogin']['error'] != null) {
+          setState(() {
+            errors = resultData['customerLogin']['error']['message'];
+          });
+        }
         if (resultData != null &&
             resultData['customerLogin']['error'] == null) {
           final user = UserModel.fromJson(resultData['customerLogin']['user']);
