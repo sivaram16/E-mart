@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pazhamuthir_emart/constants/colors.dart';
 import 'package:pazhamuthir_emart/constants/graphql/customerLoginAuth.dart';
@@ -161,7 +162,7 @@ class _LoginState extends State<Login> {
     );
   }
 
-  Widget _loginButton(RunMutation runmutation) {
+  Widget _loginButton(RunMutation runmutation, bool isLoading) {
     return Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisAlignment: MainAxisAlignment.end,
@@ -181,11 +182,15 @@ class _LoginState extends State<Login> {
                   borderRadius: BorderRadius.circular(10.0),
                 ),
                 elevation: 10,
-                child: Text(
-                  "LOG IN",
-                  style: TextStyle(
-                      color: GREEN_COLOR, fontSize: 18, letterSpacing: 1.8),
-                ),
+                child: isLoading
+                    ? CupertinoActivityIndicator()
+                    : Text(
+                        "LOG IN",
+                        style: TextStyle(
+                            color: GREEN_COLOR,
+                            fontSize: 18,
+                            letterSpacing: 1.8),
+                      ),
               ))
         ]);
   }
@@ -228,7 +233,7 @@ class _LoginState extends State<Login> {
         RunMutation runMutation,
         QueryResult result,
       ) {
-        return _loginButton(runMutation);
+        return _loginButton(runMutation, result.loading);
       },
       update: (Cache cache, QueryResult result) {
         return cache;

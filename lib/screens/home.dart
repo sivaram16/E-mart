@@ -313,13 +313,15 @@ class _HomeScreenState extends State<HomeScreen> {
     final inv = cartItems.firstWhere((f) => f['itemId'] == inventory.id,
         orElse: () => null);
     return Container(
-      padding: EdgeInsets.only(left: 20, right: 20),
+      padding: EdgeInsets.only(left: 20, right: 20,top: 20),
+      
       child: Row(
         children: <Widget>[
-          Image.network(
-            'http://pazhamudhir.herokuapp.com/image/${inventory.id}',
-            height: 100,
-            width: 80,
+          CircleAvatar(
+            radius: 30.0,
+            backgroundImage: NetworkImage(
+                "http://pazhamudhir.herokuapp.com/image/${inventory.id}"),
+            backgroundColor: Colors.transparent,
           ),
           Expanded(
             child: Column(

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pazhamuthir_emart/constants/colors.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -98,7 +99,7 @@ class _RegisterState extends State<Register> {
     );
   }
 
-  Widget _createAcc(RunMutation runMutation) {
+  Widget _createAcc(RunMutation runMutation, bool isLoading) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
@@ -115,10 +116,12 @@ class _RegisterState extends State<Register> {
                 "password": input['password'],
               });
             },
-            child: Text(
-              "CREATE ACCOUNT",
-              style: TextStyle(color: WHITE_COLOR, fontSize: 14),
-            ),
+            child: isLoading
+                ? CupertinoActivityIndicator()
+                : Text(
+                    "CREATE ACCOUNT",
+                    style: TextStyle(color: WHITE_COLOR, fontSize: 14),
+                  ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.0),
             ),
@@ -137,7 +140,7 @@ class _RegisterState extends State<Register> {
         RunMutation runMutation,
         QueryResult result,
       ) {
-        return _createAcc(runMutation);
+        return _createAcc(runMutation, result.loading);
       },
       update: (Cache cache, QueryResult result) {
         return cache;
